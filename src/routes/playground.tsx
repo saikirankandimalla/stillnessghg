@@ -17,29 +17,14 @@ const GLOBAL_STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
 
   :root {
-    --bg:        #FCFCFB;
-    --blue:      #DCEAF7;
-    --pink:      #FADFE4;
-    --mint:      #DFF1E7;
-    --glow:      #F4F0FF;
-    --sage:      #5a9467;
-    --moss:      #3d7a52;
-    --clay:      #c4956a;
-    --dusk:      #7b6fa0;
-    --mist:      #7aaec2;
-    --ink:       #2a2a35;
-    --ink-soft:  #4a4a5a;
-    --ink-muted: rgba(42,42,53,0.5);
-    --blue-dk:   #4a89c4;
-    --pink-dk:   #d4607a;
-    --mint-dk:   #3a9e68;
-    --glow-dk:   #7c6fc4;
-    --divider:   rgba(42,42,53,0.08);
-    --card-bg:   rgba(255,255,255,0.72);
-    --shadow-blue: rgba(74,137,196,0.15);
-    --shadow-pink: rgba(212,96,122,0.15);
-    --shadow-mint: rgba(58,158,104,0.15);
-    --shadow-glow: rgba(124,111,196,0.15);
+    --sage:    #8fad94;
+    --moss:    #4a7c59;
+    --clay:    #c4956a;
+    --dusk:    #7b6fa0;
+    --mist:    #b8cdd4;
+    --ink:     #1a1f2e;
+    --paper:   #f4f0e8;
+    --cream:   #faf7f2;
   }
 
   * { box-sizing: border-box; }
@@ -121,20 +106,19 @@ const GLOBAL_STYLES = `
 function Lab() {
   return (
     <div style={{
-      background: "#FCFCFB",
+      background: "linear-gradient(160deg, #0d1117 0%, #111827 40%, #0f1a14 70%, #0d1117 100%)",
       minHeight: "100vh",
       overflowX: "hidden",
       fontFamily: "'DM Sans', sans-serif",
-      color: "#2a2a35",
+      color: "#e8f0eb",
     }}>
       <style>{GLOBAL_STYLES}</style>
 
-      {/* Ambient background orbs — soft pastel, light theme */}
+      {/* Ambient background orbs */}
       <div style={{ position:"fixed", inset:0, pointerEvents:"none", overflow:"hidden", zIndex:0 }}>
-        <div className="animate-blob" style={{ position:"absolute", top:"-8%", right:"-8%", width:520, height:520, borderRadius:"50%", background:"radial-gradient(circle, rgba(220,234,247,0.7) 0%, transparent 70%)", filter:"blur(70px)" }} />
-        <div className="animate-blob anim-delay-2000" style={{ position:"absolute", bottom:"-8%", left:"-8%", width:440, height:440, borderRadius:"50%", background:"radial-gradient(circle, rgba(250,223,228,0.65) 0%, transparent 70%)", filter:"blur(70px)" }} />
-        <div className="animate-blob anim-delay-4000" style={{ position:"absolute", top:"38%", left:"28%", width:380, height:380, borderRadius:"50%", background:"radial-gradient(circle, rgba(223,241,231,0.6) 0%, transparent 70%)", filter:"blur(70px)" }} />
-        <div className="animate-blob" style={{ position:"absolute", top:"15%", left:"55%", width:300, height:300, borderRadius:"50%", background:"radial-gradient(circle, rgba(244,240,255,0.65) 0%, transparent 70%)", filter:"blur(60px)", animationDelay:"1s" }} />
+        <div className="animate-blob" style={{ position:"absolute", top:"-10%", right:"-10%", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(74,124,89,0.18) 0%, transparent 70%)", filter:"blur(60px)" }} />
+        <div className="animate-blob anim-delay-2000" style={{ position:"absolute", bottom:"-10%", left:"-10%", width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(123,111,160,0.15) 0%, transparent 70%)", filter:"blur(60px)" }} />
+        <div className="animate-blob anim-delay-4000" style={{ position:"absolute", top:"40%", left:"30%", width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(196,149,106,0.1) 0%, transparent 70%)", filter:"blur(60px)" }} />
       </div>
 
       <div style={{ position:"relative", zIndex:1 }}>
@@ -147,7 +131,6 @@ function Lab() {
         <CalmGame />
         <SoundSpace />
         <BodyScan />
-        <PunchBag />
         <FooterCTA />
       </div>
     </div>
@@ -158,35 +141,34 @@ function Lab() {
 
 function HeroSection() {
   const pills = [
-    { label:"Breathe",   color:"rgba(220,234,247,0.8)",  border:"rgba(74,137,196,0.35)",  text:"#4a89c4" },
-    { label:"Release",   color:"rgba(250,223,228,0.8)",  border:"rgba(212,96,122,0.35)",  text:"#d4607a" },
-    { label:"Focus",     color:"rgba(244,240,255,0.8)",  border:"rgba(124,111,196,0.35)", text:"#7c6fc4" },
-    { label:"Listen",    color:"rgba(220,234,247,0.8)",  border:"rgba(74,137,196,0.35)",  text:"#3a7ab0" },
-    { label:"Garden",    color:"rgba(223,241,231,0.8)",  border:"rgba(58,158,104,0.35)",  text:"#3a9e68" },
-    { label:"Gratitude", color:"rgba(244,240,255,0.8)",  border:"rgba(124,111,196,0.3)",  text:"#9c8fda" },
-    { label:"Body",      color:"rgba(223,241,231,0.8)",  border:"rgba(90,148,103,0.35)",  text:"#5a9467" },
-    { label:"Punch Bag", color:"rgba(250,223,228,0.8)",  border:"rgba(212,96,122,0.35)",  text:"#d4607a" },
+    { label:"Breathe", color:"rgba(143,173,148,0.25)", border:"rgba(143,173,148,0.5)", text:"#a8c9ae" },
+    { label:"Release", color:"rgba(123,111,160,0.25)", border:"rgba(123,111,160,0.5)", text:"#b0a8d4" },
+    { label:"Focus",   color:"rgba(196,149,106,0.25)", border:"rgba(196,149,106,0.5)", text:"#d4b08a" },
+    { label:"Listen",  color:"rgba(184,205,212,0.25)", border:"rgba(184,205,212,0.5)", text:"#a8c9d4" },
+    { label:"Garden",  color:"rgba(143,173,148,0.25)", border:"rgba(74,124,89,0.5)",  text:"#7bc491" },
+    { label:"Gratitude",color:"rgba(196,149,106,0.2)", border:"rgba(196,149,106,0.4)",text:"#e8c08a" },
+    { label:"Body",    color:"rgba(184,205,212,0.2)",  border:"rgba(184,205,212,0.4)",text:"#b8cdd4" },
   ];
 
   return (
     <section style={{ padding:"120px 40px 80px", maxWidth:1100, margin:"0 auto" }}>
       <div style={{ opacity:0 }} className="animate-fadeUp anim-delay-200">
-        <p style={{ fontSize:11, letterSpacing:"0.35em", textTransform:"uppercase", color:"#5a9467", marginBottom:24, fontWeight:500 }}>
+        <p style={{ fontSize:11, letterSpacing:"0.35em", textTransform:"uppercase", color:"rgba(143,173,148,0.8)", marginBottom:24 }}>
           ✦ Interactive Healing Lab
         </p>
-        <h1 className="serif" style={{ fontSize:"clamp(42px,6vw,76px)", fontWeight:300, lineHeight:1.1, color:"#2a2a35", margin:"0 0 28px", letterSpacing:"-0.5px" }}>
+        <h1 className="serif" style={{ fontSize:"clamp(42px,6vw,76px)", fontWeight:300, lineHeight:1.1, color:"rgba(235,245,238,0.97)", margin:"0 0 28px", letterSpacing:"-0.5px" }}>
           Take a moment<br />
-          <em style={{ color:"#5a9467" }}>for yourself.</em>
+          <em style={{ color:"rgba(143,173,148,0.9)" }}>for yourself.</em>
         </h1>
       </div>
 
-      <p style={{ opacity:0, fontSize:18, lineHeight:1.8, color:"rgba(42,42,53,0.6)", maxWidth:520, margin:"0 0 48px", fontWeight:300 }} className="animate-fadeUp anim-delay-400">
-        Eight practices designed to help you breathe, release, focus, and return to peace. No login. No measurement. Just presence.
+      <p style={{ opacity:0, fontSize:18, lineHeight:1.8, color:"rgba(185,210,195,0.75)", maxWidth:520, margin:"0 0 48px", fontWeight:300 }} className="animate-fadeUp anim-delay-400">
+        Seven practices designed to help you breathe, release, focus, and return to peace. No login. No measurement. Just presence.
       </p>
 
       <div style={{ display:"flex", flexWrap:"wrap", gap:10, opacity:0 }} className="animate-fadeUp anim-delay-600">
         {pills.map((p) => (
-          <span key={p.label} style={{ padding:"8px 18px", borderRadius:50, background:p.color, border:`1px solid ${p.border}`, fontSize:12, letterSpacing:"0.2em", textTransform:"uppercase", color:p.text, fontWeight:600 }}>
+          <span key={p.label} style={{ padding:"8px 18px", borderRadius:50, background:p.color, border:`1px solid ${p.border}`, fontSize:12, letterSpacing:"0.2em", textTransform:"uppercase", color:p.text, fontWeight:500 }}>
             {p.label}
           </span>
         ))}
@@ -234,44 +216,39 @@ function Breathing() {
   }, []);
 
   const size = phase === "Inhale" ? 280 : phase === "Hold" ? 280 : 160;
-  const phaseColor: Record<string,string> = {
-    Inhale: "rgba(74,137,196,",
-    Hold:   "rgba(124,111,196,",
-    Exhale: "rgba(58,158,104,",
-  };
+  const phaseColor: Record<string,string> = { Inhale:"rgba(143,173,148,", Hold:"rgba(184,205,212,", Exhale:"rgba(123,111,160," };
   const c = phaseColor[phase];
 
   return (
-    <section style={{ padding:"80px 40px", borderTop:`1px solid rgba(42,42,53,0.07)` }}>
-      <SectionHeader eyebrow="01 — Breathe" title="Follow the rhythm." subtitle="Box breathing: 4-4-4. Proven to calm your nervous system in minutes." color="#4a89c4" />
+    <section style={{ padding:"80px 40px", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+      <SectionHeader eyebrow="01 — Breathe" title="Follow the rhythm." subtitle="Box breathing: 4-4-4. Proven to calm your nervous system in minutes." color="rgba(143,173,148,0.8)" />
 
       <div style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:48, marginTop:64 }}>
         <div style={{ position:"relative", width:360, height:360, display:"flex", alignItems:"center", justifyContent:"center" }}>
-          <div style={{ position:"absolute", width:size+80, height:size+80, borderRadius:"50%", background:`radial-gradient(circle, ${c}0.18) 0%, transparent 70%)`, filter:"blur(40px)", transition:"all 4s ease-in-out" }} />
+          {/* Glow */}
+          <div style={{ position:"absolute", width:size+80, height:size+80, borderRadius:"50%", background:`radial-gradient(circle, ${c}0.25) 0%, transparent 70%)`, filter:"blur(30px)", transition:"all 4s ease-in-out" }} />
+          {/* Rings */}
           {[size+80, size+40, size].map((s, i) => (
-            <div key={i} style={{ position:"absolute", width:s, height:s, borderRadius:"50%", border:`1.5px solid ${c}${0.4 - i*0.1})`, transition:"all 4s ease-in-out", background: i === 2 ? `${c}0.06)` : "transparent" }} />
+            <div key={i} style={{ position:"absolute", width:s, height:s, borderRadius:"50%", border:`1px solid ${c}${0.5 - i*0.12})`, transition:"all 4s ease-in-out" }} />
           ))}
+          {/* Center */}
           <div style={{ position:"relative", textAlign:"center" }}>
-            <div className="serif" style={{ fontSize:72, color:"#2a2a35", lineHeight:1, fontWeight:300 }}>{count}</div>
-            <div style={{ fontSize:13, letterSpacing:"0.3em", textTransform:"uppercase", color:`${c}0.9)`, marginTop:8, fontWeight:500 }}>{phase}</div>
+            <div className="serif" style={{ fontSize:72, color:"rgba(235,245,238,0.95)", lineHeight:1, fontWeight:300 }}>{count}</div>
+            <div style={{ fontSize:13, letterSpacing:"0.3em", textTransform:"uppercase", color:`${c}0.9)`, marginTop:8 }}>{phase}</div>
           </div>
         </div>
 
         <div style={{ display:"flex", gap:40 }}>
-          {[
-            {label:"Inhale", dur:"4s", c:"#4a89c4"},
-            {label:"Hold",   dur:"4s", c:"#7c6fc4"},
-            {label:"Exhale", dur:"4s", c:"#3a9e68"},
-          ].map(b => (
+          {[{label:"Inhale",dur:"4s",c:"rgba(143,173,148,0.9)"},{label:"Hold",dur:"4s",c:"rgba(184,205,212,0.9)"},{label:"Exhale",dur:"4s",c:"rgba(123,111,160,0.9)"}].map(b => (
             <div key={b.label} style={{ textAlign:"center" }}>
               <div className="serif" style={{ fontSize:28, color:b.c, fontWeight:300 }}>{b.dur}</div>
-              <div style={{ fontSize:11, color:"rgba(42,42,53,0.45)", letterSpacing:"0.2em", textTransform:"uppercase", marginTop:4 }}>{b.label}</div>
+              <div style={{ fontSize:11, color:"rgba(185,210,195,0.5)", letterSpacing:"0.2em", textTransform:"uppercase", marginTop:4 }}>{b.label}</div>
             </div>
           ))}
         </div>
 
         {cycles > 0 && (
-          <div style={{ padding:"10px 24px", borderRadius:50, background:"#DFF1E7", border:"1px solid rgba(58,158,104,0.3)", fontSize:13, color:"#3a9e68", fontWeight:600 }}>
+          <div style={{ padding:"10px 24px", borderRadius:50, background:"rgba(143,173,148,0.1)", border:"1px solid rgba(143,173,148,0.2)", fontSize:13, color:"rgba(143,173,148,0.8)" }}>
             ✦ {cycles} cycle{cycles > 1 ? "s" : ""} completed
           </div>
         )}
@@ -298,8 +275,8 @@ function ThoughtRelease() {
   };
 
   return (
-    <section style={{ padding:"80px 40px", borderTop:`1px solid rgba(42,42,53,0.07)`, background:"linear-gradient(135deg, rgba(250,223,228,0.3) 0%, rgba(244,240,255,0.3) 100%)" }}>
-      <SectionHeader eyebrow="02 — Release" title="Write it. Let it go." subtitle="Name what's weighing on you, then watch it dissolve." color="#d4607a" />
+    <section style={{ padding:"80px 40px", borderTop:"1px solid rgba(255,255,255,0.06)", background:"linear-gradient(135deg, rgba(123,111,160,0.05) 0%, rgba(196,149,106,0.05) 100%)" }}>
+      <SectionHeader eyebrow="02 — Release" title="Write it. Let it go." subtitle="Name what's weighing on you, then watch it dissolve." color="rgba(123,111,160,0.8)" />
 
       <div style={{ maxWidth:640, margin:"48px auto 0", position:"relative" }}>
         {/* Floating particles */}
@@ -313,15 +290,14 @@ function ThoughtRelease() {
           placeholder="Whatever is on your mind…"
           rows={7}
           style={{
-            width:"100%", background:"rgba(255,255,255,0.75)", backdropFilter:"blur(10px)",
-            border:"1px solid rgba(212,96,122,0.25)", borderRadius:20, padding:"24px",
-            fontSize:17, color:"#2a2a35", fontFamily:"'Cormorant Garamond', serif",
+            width:"100%", background:"rgba(255,255,255,0.04)", backdropFilter:"blur(10px)",
+            border:"1px solid rgba(123,111,160,0.3)", borderRadius:20, padding:"24px",
+            fontSize:17, color:"rgba(235,245,238,0.9)", fontFamily:"'Cormorant Garamond', serif",
             fontWeight:300, lineHeight:1.8, resize:"none", outline:"none",
             transition:`all ${dissolving?"3.5s":"0.3s"} ease`,
             opacity: dissolving ? 0 : 1,
             filter: dissolving ? "blur(12px)" : "none",
             transform: dissolving ? "scale(0.96)" : "scale(1)",
-            boxShadow:"0 4px 24px rgba(212,96,122,0.08)",
           }}
         />
 
@@ -331,17 +307,16 @@ function ThoughtRelease() {
             disabled={!text.trim()}
             style={{
               padding:"12px 32px", borderRadius:50,
-              background: text.trim() ? "linear-gradient(135deg, #d4607a, #7c6fc4)" : "rgba(42,42,53,0.06)",
-              border:"none", color: text.trim() ? "white" : "rgba(42,42,53,0.3)",
+              background: text.trim() ? "linear-gradient(135deg, rgba(123,111,160,0.6), rgba(196,149,106,0.5))" : "rgba(255,255,255,0.05)",
+              border:"1px solid rgba(123,111,160,0.4)", color: text.trim() ? "rgba(235,245,238,0.95)" : "rgba(185,210,195,0.3)",
               fontSize:14, cursor: text.trim() ? "pointer" : "not-allowed", letterSpacing:"0.05em",
-              transition:"all 0.3s ease", fontWeight:600,
-              boxShadow: text.trim() ? "0 6px 24px rgba(212,96,122,0.25)" : "none",
+              transition:"all 0.3s ease",
             }}
           >
             ✦ Let it dissolve
           </button>
           {released > 0 && (
-            <span style={{ fontSize:13, color:"rgba(42,42,53,0.45)", fontWeight:500 }}>
+            <span style={{ fontSize:13, color:"rgba(185,210,195,0.5)" }}>
               {released} thought{released>1?"s":""} released
             </span>
           )}
