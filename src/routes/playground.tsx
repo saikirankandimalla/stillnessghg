@@ -25,6 +25,9 @@ const GLOBAL_STYLES = `
     --ink:     #1a1f2e;
     --paper:   #f4f0e8;
     --cream:   #faf7f2;
+    --teal:    #5fa8a0;
+    --aqua:    #7fd1c0;
+    --foam:    #cdeae3;
   }
 
   * { box-sizing: border-box; }
@@ -54,8 +57,8 @@ const GLOBAL_STYLES = `
     50%     { transform: translateY(-8px); }
   }
   @keyframes ripple {
-    0%   { transform: scale(0.8); opacity:1; }
-    100% { transform: scale(2.4); opacity:0; }
+    0%   { transform: scale(0.8); opacity:0.7; }
+    100% { transform: scale(2.6); opacity:0; }
   }
   @keyframes spin {
     to { transform: rotate(360deg); }
@@ -89,11 +92,38 @@ const GLOBAL_STYLES = `
     from { transform: scale(0) rotate(-30deg); opacity:0; }
     to   { transform: scale(1) rotate(0deg);  opacity:1; }
   }
+  @keyframes bubbleRise {
+    0%   { transform: translateY(0) translateX(0); opacity:0; }
+    10%  { opacity:0.75; }
+    50%  { transform: translateY(-50vh) translateX(10px); }
+    90%  { opacity:0.2; }
+    100% { transform: translateY(-100vh) translateX(-10px); opacity:0; }
+  }
+  @keyframes bubbleRiseSmall {
+    0%   { transform: translateY(0) scale(0.7); opacity:0; }
+    15%  { opacity:0.8; }
+    100% { transform: translateY(-160px) scale(1.1); opacity:0; }
+  }
+  @keyframes waveScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes sway {
+    0%,100% { transform: rotate(-4deg); }
+    50%     { transform: rotate(4deg); }
+  }
+  @keyframes rainFall {
+    0%   { transform: translateY(-30px); opacity:0; }
+    15%  { opacity:0.85; }
+    100% { transform: translateY(220px); opacity:0; }
+  }
 
   .animate-blob      { animation: blob 7s infinite; }
   .animate-float     { animation: gentleFloat 3s ease-in-out infinite; }
   .animate-fadeUp    { animation: fadeUp 0.8s ease-out forwards; }
   .animate-fadeIn    { animation: fadeIn 0.8s ease-out forwards; }
+  .animate-twinkle   { animation: twinkle 2.4s ease-in-out infinite; }
+  .animate-sway      { animation: sway 3.6s ease-in-out infinite; transform-origin: bottom center; }
   .anim-delay-200    { animation-delay: 0.2s; }
   .anim-delay-400    { animation-delay: 0.4s; }
   .anim-delay-600    { animation-delay: 0.6s; }
@@ -106,19 +136,22 @@ const GLOBAL_STYLES = `
 function Lab() {
   return (
     <div style={{
-      background: "linear-gradient(160deg, #0d1117 0%, #111827 40%, #0f1a14 70%, #0d1117 100%)",
+      background: "linear-gradient(160deg, #081820 0%, #0f2027 35%, #0a1f1a 65%, #081820 100%)",
       minHeight: "100vh",
       overflowX: "hidden",
       fontFamily: "'DM Sans', sans-serif",
       color: "#e8f0eb",
+      position: "relative",
     }}>
       <style>{GLOBAL_STYLES}</style>
 
-      {/* Ambient background orbs */}
+      {/* Ambient background orbs + drifting bubbles */}
       <div style={{ position:"fixed", inset:0, pointerEvents:"none", overflow:"hidden", zIndex:0 }}>
         <div className="animate-blob" style={{ position:"absolute", top:"-10%", right:"-10%", width:500, height:500, borderRadius:"50%", background:"radial-gradient(circle, rgba(74,124,89,0.18) 0%, transparent 70%)", filter:"blur(60px)" }} />
         <div className="animate-blob anim-delay-2000" style={{ position:"absolute", bottom:"-10%", left:"-10%", width:400, height:400, borderRadius:"50%", background:"radial-gradient(circle, rgba(123,111,160,0.15) 0%, transparent 70%)", filter:"blur(60px)" }} />
         <div className="animate-blob anim-delay-4000" style={{ position:"absolute", top:"40%", left:"30%", width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle, rgba(196,149,106,0.1) 0%, transparent 70%)", filter:"blur(60px)" }} />
+        <div className="animate-blob anim-delay-600" style={{ position:"absolute", top:"65%", right:"15%", width:380, height:380, borderRadius:"50%", background:"radial-gradient(circle, rgba(95,168,160,0.16) 0%, transparent 70%)", filter:"blur(60px)" }} />
+        <BubbleField count={20} />
       </div>
 
       <div style={{ position:"relative", zIndex:1 }}>
@@ -137,6 +170,67 @@ function Lab() {
   );
 }
 
+// ─── Shared visual helpers ─────────────────────────────────────────────────
+
+function BubbleField({ count = 16 }: { count?: number }) {
+  const bubbles = useRef(
+    Array.from({ length: count }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      size: Math.random() * 14 + 6,
+      duration: Math.random() * 12 + 14,
+      delay: Math.random() * 14,
+      hue: [165, 185, 200, 150][Math.floor(Math.random() * 4)],
+    }))
+  ).current;
+
+  return (
+    <div style={{ position:"absolute", inset:0, overflow:"hidden", pointerEvents:"none" }}>
+      {bubbles.map(b => (
+        <span key={b.id} style={{
+          position:"absolute", left:`${b.left}%`, bottom:-40,
+          width:b.size, height:b.size, borderRadius:"50%",
+          background:`radial-gradient(circle at 30% 30%, hsla(${b.hue},70%,80%,0.45), hsla(${b.hue},60%,50%,0.05))`,
+          border:`1px solid hsla(${b.hue},60%,80%,0.2)`,
+          animation:`bubbleRise ${b.duration}s ease-in-out ${b.delay}s infinite`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
+function WaveDivider({ color = "rgba(95,168,160,0.18)", height = 60 }: { color?: string; height?: number }) {
+  return (
+    <div style={{ width:"100%", overflow:"hidden", lineHeight:0 }}>
+      <svg viewBox="0 0 1200 60" preserveAspectRatio="none" style={{ width:"200%", height, animation:"waveScroll 16s linear infinite" }}>
+        <path d="M0,30 C150,60 350,0 600,30 C850,60 1050,0 1200,30 L1200,60 L0,60 Z" fill={color} />
+        <path d="M1200,30 C1350,60 1550,0 1800,30 C2050,60 2250,0 2400,30 L2400,60 L1200,60 Z" fill={color} />
+      </svg>
+    </div>
+  );
+}
+
+function TwinkleStars({ count = 10 }: { count?: number }) {
+  const stars = useRef(
+    Array.from({ length: count }, () => ({
+      x: Math.random() * 100, y: Math.random() * 100,
+      delay: Math.random() * 2.4, size: Math.random() * 2 + 1.2,
+    }))
+  ).current;
+  return (
+    <div style={{ position:"absolute", inset:-22, pointerEvents:"none" }}>
+      {stars.map((s, i) => (
+        <span key={i} className="animate-twinkle" style={{
+          position:"absolute", left:`${s.x}%`, top:`${s.y}%`,
+          width:s.size, height:s.size, borderRadius:"50%",
+          background:"rgba(212,176,138,0.85)",
+          animationDelay:`${s.delay}s`,
+        }} />
+      ))}
+    </div>
+  );
+}
+
 // ─── Hero ──────────────────────────────────────────────────────────────────
 
 function HeroSection() {
@@ -151,7 +245,7 @@ function HeroSection() {
   ];
 
   return (
-    <section style={{ padding:"120px 40px 80px", maxWidth:1100, margin:"0 auto" }}>
+    <section style={{ padding:"120px 40px 0", maxWidth:1100, margin:"0 auto" }}>
       <div style={{ opacity:0 }} className="animate-fadeUp anim-delay-200">
         <p style={{ fontSize:11, letterSpacing:"0.35em", textTransform:"uppercase", color:"rgba(143,173,148,0.8)", marginBottom:24 }}>
           ✦ Interactive Healing Lab
@@ -172,6 +266,10 @@ function HeroSection() {
             {p.label}
           </span>
         ))}
+      </div>
+
+      <div style={{ marginTop:64, opacity:0 }} className="animate-fadeIn anim-delay-600">
+        <WaveDivider color="rgba(95,168,160,0.16)" height={64} />
       </div>
     </section>
   );
@@ -227,6 +325,13 @@ function Breathing() {
         <div style={{ position:"relative", width:360, height:360, display:"flex", alignItems:"center", justifyContent:"center" }}>
           {/* Glow */}
           <div style={{ position:"absolute", width:size+80, height:size+80, borderRadius:"50%", background:`radial-gradient(circle, ${c}0.25) 0%, transparent 70%)`, filter:"blur(30px)", transition:"all 4s ease-in-out" }} />
+          {/* Outward ripples, like water settling */}
+          {[0,1,2].map(i => (
+            <div key={`ripple-${i}`} style={{
+              position:"absolute", width:130, height:130, borderRadius:"50%",
+              border:`1px solid ${c}0.35)`, animation:`ripple 4.5s ease-out ${i*1.5}s infinite`,
+            }} />
+          ))}
           {/* Rings */}
           {[size+80, size+40, size].map((s, i) => (
             <div key={i} style={{ position:"absolute", width:s, height:s, borderRadius:"50%", border:`1px solid ${c}${0.5 - i*0.12})`, transition:"all 4s ease-in-out" }} />
@@ -263,12 +368,18 @@ function ThoughtRelease() {
   const [text, setText] = useState("");
   const [dissolving, setDissolving] = useState(false);
   const [released, setReleased] = useState(0);
-  const [particles, setParticles] = useState<{id:number;x:number;y:number;color:string}[]>([]);
+  const [particles, setParticles] = useState<{id:number;x:number;y:number;color:string;size:number}[]>([]);
 
   const handleRelease = () => {
     if (!text.trim()) return;
     const colors = ["#8fad94","#b0a8d4","#d4b08a","#a8c9d4"];
-    setParticles(Array.from({length:12},(_,i)=>({ id:Date.now()+i, x:Math.random()*100, y:Math.random()*100, color:colors[Math.floor(Math.random()*4)] })));
+    setParticles(Array.from({length:18},(_,i)=>({
+      id:Date.now()+i,
+      x:Math.random()*100,
+      y:Math.random()*100,
+      color:colors[Math.floor(Math.random()*4)],
+      size: i % 3 === 0 ? Math.random()*10+8 : Math.random()*5+3,
+    })));
     setDissolving(true);
     setReleased(r => r+1);
     setTimeout(() => { setText(""); setDissolving(false); setParticles([]); }, 3500);
@@ -279,9 +390,15 @@ function ThoughtRelease() {
       <SectionHeader eyebrow="02 — Release" title="Write it. Let it go." subtitle="Name what's weighing on you, then watch it dissolve." color="rgba(123,111,160,0.8)" />
 
       <div style={{ maxWidth:640, margin:"48px auto 0", position:"relative" }}>
-        {/* Floating particles */}
+        {/* Floating particles, rising and fading like bubbles released to the surface */}
         {particles.map(p => (
-          <div key={p.id} style={{ position:"absolute", left:`${p.x}%`, top:`${p.y}%`, width:6, height:6, borderRadius:"50%", background:p.color, animation:"fadeUp 3s ease-out forwards", pointerEvents:"none", zIndex:10 }} />
+          <div key={p.id} style={{
+            position:"absolute", left:`${p.x}%`, top:`${p.y}%`,
+            width:p.size, height:p.size, borderRadius:"50%",
+            background:`radial-gradient(circle at 30% 30%, ${p.color}cc, ${p.color}22)`,
+            border:`1px solid ${p.color}55`,
+            animation:"bubbleRiseSmall 3s ease-out forwards", pointerEvents:"none", zIndex:10,
+          }} />
         ))}
 
         <textarea
@@ -326,7 +443,7 @@ function ThoughtRelease() {
   );
 }
 
-// ─── 03 Mandala Focus (NEW) ────────────────────────────────────────────────
+// ─── 03 Mandala Focus ───────────────────────────────────────────────────────
 
 function MandalaFocus() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -405,27 +522,32 @@ function MandalaFocus() {
           </label>
         </div>
 
-        {/* Canvas */}
-        <canvas
-          ref={canvasRef}
-          width={500}
-          height={500}
-          onMouseDown={e=>{setDrawing(true); lastPos.current=null;}}
-          onMouseUp={()=>{setDrawing(false); lastPos.current=null;}}
-          onMouseLeave={()=>{setDrawing(false); lastPos.current=null;}}
-          onMouseMove={draw}
-          onTouchStart={e=>{e.preventDefault(); setDrawing(true); lastPos.current=null;}}
-          onTouchEnd={()=>{setDrawing(false); lastPos.current=null;}}
-          onTouchMove={e=>{e.preventDefault(); draw(e);}}
-          style={{
-            background:"rgba(10,18,12,0.8)",
-            border:"1px solid rgba(196,149,106,0.2)",
-            borderRadius:16,
-            cursor:"crosshair",
-            touchAction:"none",
-            maxWidth:"100%",
-          }}
-        />
+        {/* Canvas with ambient glow + twinkle halo */}
+        <div style={{ position:"relative" }}>
+          <div style={{ position:"absolute", inset:-30, borderRadius:"50%", background:`radial-gradient(circle, hsla(${hue},60%,60%,0.12) 0%, transparent 70%)`, filter:"blur(20px)", transition:"background 0.4s ease" }} />
+          <TwinkleStars count={12} />
+          <canvas
+            ref={canvasRef}
+            width={500}
+            height={500}
+            onMouseDown={()=>{setDrawing(true); lastPos.current=null;}}
+            onMouseUp={()=>{setDrawing(false); lastPos.current=null;}}
+            onMouseLeave={()=>{setDrawing(false); lastPos.current=null;}}
+            onMouseMove={draw}
+            onTouchStart={e=>{e.preventDefault(); setDrawing(true); lastPos.current=null;}}
+            onTouchEnd={()=>{setDrawing(false); lastPos.current=null;}}
+            onTouchMove={e=>{e.preventDefault(); draw(e);}}
+            style={{
+              position:"relative",
+              background:"rgba(10,18,12,0.85)",
+              border:"1px solid rgba(196,149,106,0.2)",
+              borderRadius:16,
+              cursor:"crosshair",
+              touchAction:"none",
+              maxWidth:"100%",
+            }}
+          />
+        </div>
 
         <div style={{ display:"flex", gap:16, alignItems:"center" }}>
           <button onClick={clearCanvas} style={{ padding:"10px 28px", borderRadius:50, background:"rgba(196,149,106,0.15)", border:"1px solid rgba(196,149,106,0.3)", color:"rgba(212,176,138,0.9)", fontSize:13, cursor:"pointer", letterSpacing:"0.05em" }}>
@@ -441,7 +563,7 @@ function MandalaFocus() {
   );
 }
 
-// ─── 04 Gratitude Jar (NEW) ────────────────────────────────────────────────
+// ─── 04 Gratitude Jar ───────────────────────────────────────────────────────
 
 function GratitudeJar() {
   const [input, setInput] = useState("");
@@ -459,6 +581,12 @@ function GratitudeJar() {
     setTimeout(() => setAnimating(null), 600);
   };
 
+  const jarBubbles = useRef(
+    Array.from({ length: 6 }, () => ({
+      x: Math.random()*70+15, delay: Math.random()*4, dur: Math.random()*3+3, size: Math.random()*4+2,
+    }))
+  ).current;
+
   return (
     <section style={{ padding:"80px 40px", borderTop:"1px solid rgba(255,255,255,0.06)", background:"linear-gradient(135deg, rgba(196,149,106,0.04) 0%, rgba(143,173,148,0.04) 100%)" }}>
       <SectionHeader eyebrow="04 — Gratitude" title="Fill your jar." subtitle="Research shows 3 things daily rewires your brain toward positivity within 3 weeks." color="rgba(196,149,106,0.8)" />
@@ -468,9 +596,27 @@ function GratitudeJar() {
         <div style={{ position:"relative", width:220, margin:"0 auto 40px", minHeight:260 }}>
           {/* Jar outline SVG */}
           <svg viewBox="0 0 220 280" width="220" height="280" style={{ position:"absolute", top:0, left:0 }}>
+            <defs>
+              <linearGradient id="glassShine" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(255,255,255,0)" />
+                <stop offset="45%" stopColor="rgba(255,255,255,0.12)" />
+                <stop offset="55%" stopColor="rgba(255,255,255,0.12)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+              </linearGradient>
+            </defs>
             <path d="M60 40 Q55 20 80 15 L140 15 Q165 20 160 40 L175 240 Q175 265 110 265 Q45 265 45 240 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(196,149,106,0.3)" strokeWidth="1.5" />
             <path d="M75 15 L145 15 Q155 15 155 25 L155 35 L65 35 L65 25 Q65 15 75 15 Z" fill="rgba(196,149,106,0.1)" stroke="rgba(196,149,106,0.3)" strokeWidth="1" />
+            <path d="M60 40 Q55 20 80 15 L140 15 Q165 20 160 40 L175 240 Q175 265 110 265 Q45 265 45 240 Z" fill="url(#glassShine)" style={{ backgroundSize:"200% auto", animation:"shimmer 6s linear infinite" }} />
           </svg>
+          {/* Rising bubbles inside the jar */}
+          <div style={{ position:"absolute", left:45, top:45, right:45, bottom:15, overflow:"hidden", borderRadius:"0 0 60px 60px" }}>
+            {jarBubbles.map((b,i) => (
+              <span key={i} style={{
+                position:"absolute", left:`${b.x}%`, bottom:0, width:b.size, height:b.size, borderRadius:"50%",
+                background:"rgba(196,149,106,0.35)", animation:`bubbleRiseSmall ${b.dur}s ease-in-out ${b.delay}s infinite`,
+              }} />
+            ))}
+          </div>
           {/* Notes inside jar */}
           <div style={{ position:"absolute", left:55, top:55, right:55, bottom:30, display:"flex", flexWrap:"wrap", gap:4, alignContent:"flex-end", overflow:"hidden" }}>
             {notes.slice(-12).map(n => (
@@ -531,7 +677,7 @@ function GratitudeJar() {
   );
 }
 
-// ─── 05 Mood Garden (NEW) ─────────────────────────────────────────────────
+// ─── 05 Mood Garden ─────────────────────────────────────────────────────────
 
 const MOODS = [
   { emoji:"😌", label:"Calm",    color:"#8fad94" },
@@ -544,9 +690,36 @@ const MOODS = [
   { emoji:"💪", label:"Strong",  color:"#6aad8a" },
 ];
 
+function GardenBed({ history }: { history: {mood:string;time:string;color:string;emoji:string}[] }) {
+  return (
+    <div style={{
+      position:"relative", width:"100%", minHeight:140, display:"flex", alignItems:"flex-end",
+      gap:18, padding:"0 28px 18px", overflowX:"auto",
+      background:"linear-gradient(180deg, transparent 0%, rgba(74,124,89,0.07) 65%, rgba(74,124,89,0.16) 100%)",
+      borderRadius:20, border:"1px solid rgba(143,173,148,0.15)",
+    }}>
+      {history.length === 0 && (
+        <span style={{ margin:"auto", fontSize:12, color:"rgba(185,210,195,0.35)", letterSpacing:"0.05em" }}>
+          your garden will grow as you check in
+        </span>
+      )}
+      {history.map((h,i) => (
+        <div key={i} className="animate-sway" style={{
+          display:"flex", flexDirection:"column", alignItems:"center", flexShrink:0,
+          animationDelay:`${(i%5)*0.3}s`, paddingBottom:6,
+        }}>
+          <span style={{ fontSize:20, marginBottom:-6, filter:`drop-shadow(0 0 6px ${h.color}80)` }}>{h.emoji}</span>
+          <div style={{ width:2, height:30 + (i%3)*14, background:`linear-gradient(180deg, ${h.color}, rgba(74,124,89,0.35))`, borderRadius:2 }} />
+          <span style={{ fontSize:9, color:"rgba(185,210,195,0.4)", marginTop:4 }}>{h.time}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function MoodGarden() {
   const [selected, setSelected] = useState<string|null>(null);
-  const [history, setHistory] = useState<{mood:string;time:string;color:string}[]>([]);
+  const [history, setHistory] = useState<{mood:string;time:string;color:string;emoji:string}[]>([]);
   const [bloomed, setBloomed] = useState(false);
 
   const select = (m: typeof MOODS[0]) => {
@@ -554,7 +727,7 @@ function MoodGarden() {
     setBloomed(false);
     setTimeout(() => setBloomed(true), 100);
     const time = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
-    setHistory(h => [...h.slice(-7), { mood:m.label, time, color:m.color }]);
+    setHistory(h => [...h.slice(-7), { mood:m.label, time, color:m.color, emoji:m.emoji }]);
   };
 
   const current = MOODS.find(m => m.label === selected);
@@ -601,16 +774,8 @@ function MoodGarden() {
           </div>
         )}
 
-        {/* History */}
-        {history.length > 1 && (
-          <div style={{ width:"100%", display:"flex", gap:8, flexWrap:"wrap", justifyContent:"center" }}>
-            {history.map((h,i) => (
-              <div key={i} style={{ padding:"6px 14px", borderRadius:50, background:`${h.color}20`, border:`1px solid ${h.color}40`, fontSize:12, color:"rgba(185,210,195,0.6)" }}>
-                {h.mood} <span style={{ opacity:0.5 }}>{h.time}</span>
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Growing garden bed of past check-ins */}
+        {history.length > 0 && <GardenBed history={history} />}
       </div>
     </section>
   );
@@ -674,6 +839,19 @@ function CalmGame() {
 
   const calmLevel = Math.max(0, Math.round((1 - speed) * 100));
 
+  // Draw faint constellation lines between nearby dots — appears as the field calms
+  const lines: { x1:number;y1:number;x2:number;y2:number;o:number }[] = [];
+  if (calmLevel > 25) {
+    const pts = state.current;
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i+1; j < pts.length; j++) {
+        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 14) lines.push({ x1:pts[i].x, y1:pts[i].y, x2:pts[j].x, y2:pts[j].y, o: (1 - dist/14) * (calmLevel/100) * 0.5 });
+      }
+    }
+  }
+
   return (
     <section style={{ padding:"80px 40px", borderTop:"1px solid rgba(255,255,255,0.06)", background:"linear-gradient(135deg, rgba(123,111,160,0.04) 0%, rgba(184,205,212,0.04) 100%)" }}>
       <SectionHeader eyebrow="06 — Focus" title="Bring the chaos to calm." subtitle="Each tap slows the noise. A metaphor for your mind — and a practice for your attention." color="rgba(123,111,160,0.8)" />
@@ -688,6 +866,11 @@ function CalmGame() {
             overflow:"hidden", cursor:"pointer",
           }}
         >
+          <svg style={{ position:"absolute", inset:0, width:"100%", height:"100%" }} viewBox="0 0 100 100" preserveAspectRatio="none">
+            {lines.map((l,i) => (
+              <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke={`rgba(184,205,212,${l.o})`} strokeWidth={0.15} />
+            ))}
+          </svg>
           {state.current.map((d, i) => (
             <span key={i} style={{
               position:"absolute", borderRadius:"50%",
@@ -727,16 +910,70 @@ function CalmGame() {
 
 // ─── 07 Sound Space ───────────────────────────────────────────────────────
 
+function SoundGraphic({ id }: { id: string }) {
+  if (id === "rain") {
+    return (
+      <div style={{ position:"absolute", inset:0 }}>
+        {Array.from({length:16}).map((_,i) => (
+          <span key={i} style={{
+            position:"absolute", left:`${(i*6.3)%100}%`, top:0, width:1.5, height:18,
+            background:"linear-gradient(180deg, rgba(184,205,212,0.7), transparent)",
+            animation:`rainFall ${1+(i%5)*0.2}s linear ${i*0.13}s infinite`,
+          }} />
+        ))}
+      </div>
+    );
+  }
+  if (id === "ocean") {
+    return (
+      <svg viewBox="0 0 400 90" preserveAspectRatio="none" style={{ width:"100%", height:"100%" }}>
+        <path fill="rgba(74,124,89,0.3)">
+          <animate attributeName="d" dur="5s" repeatCount="indefinite"
+            values="M0,55 C50,30 100,75 150,55 C200,35 250,75 300,55 C350,35 380,55 400,50 L400,90 L0,90 Z;
+                    M0,50 C50,75 100,30 150,50 C200,75 250,35 300,50 C350,75 380,50 400,55 L400,90 L0,90 Z;
+                    M0,55 C50,30 100,75 150,55 C200,35 250,75 300,55 C350,35 380,55 400,50 L400,90 L0,90 Z" />
+        </path>
+        <path fill="rgba(95,168,160,0.22)">
+          <animate attributeName="d" dur="7s" repeatCount="indefinite"
+            values="M0,65 C60,45 120,80 180,65 C240,50 300,80 400,62 L400,90 L0,90 Z;
+                    M0,62 C60,80 120,45 180,62 C240,80 300,50 400,65 L400,90 L0,90 Z;
+                    M0,65 C60,45 120,80 180,65 C240,50 300,80 400,62 L400,90 L0,90 Z" />
+        </path>
+      </svg>
+    );
+  }
+  if (id === "forest") {
+    return (
+      <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"flex-end", justifyContent:"space-around", paddingBottom:4 }}>
+        {[0,1,2,3,4].map(i => (
+          <div key={i} className="animate-sway" style={{ animationDelay:`${i*0.4}s`, fontSize:22+(i%3)*8, opacity:0.85 }}>🌲</div>
+        ))}
+      </div>
+    );
+  }
+  // silence — soft pulsing rings of quiet
+  return (
+    <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+      <div style={{ position:"relative", width:36, height:36 }}>
+        {[0,1].map(i => (
+          <div key={i} style={{ position:"absolute", inset:0, borderRadius:"50%", border:"1px solid rgba(123,111,160,0.4)", animation:`ripple 3s ease-out ${i*1.5}s infinite` }} />
+        ))}
+        <div style={{ position:"absolute", inset:8, borderRadius:"50%", background:"rgba(123,111,160,0.3)" }} />
+      </div>
+    </div>
+  );
+}
+
 function SoundSpace() {
   const [active, setActive] = useState<string|null>(null);
   const [volume, setVolume] = useState(0.5);
   const audioRef = useRef<HTMLAudioElement|null>(null);
 
   const sounds = [
-    { id:"rain",   label:"Rain",    emoji:"🌧️", desc:"Gentle rainfall",     url:"https://assets.mixkit.co/active_storage/sfx/2303/2303-preview.mp3", color:"rgba(184,205,212,0.3)" },
-    { id:"ocean",  label:"Ocean",   emoji:"🌊", desc:"Waves and tide",       url:"https://assets.mixkit.co/active_storage/sfx/2269/2269-preview.mp3", color:"rgba(74,124,89,0.3)" },
-    { id:"forest", label:"Forest",  emoji:"🌲", desc:"Birds and breeze",     url:"https://assets.mixkit.co/active_storage/sfx/2267/2267-preview.mp3", color:"rgba(143,173,148,0.3)" },
-    { id:"silence",label:"Silence", emoji:"🔇", desc:"Pure quiet",           url:null, color:"rgba(123,111,160,0.3)" },
+    { id:"rain",   label:"Rain",    emoji:"🌧️", desc:"Gentle rainfall",     url:"/assets/rain.mp3", color:"rgba(184,205,212,0.3)" },
+    { id:"ocean",  label:"Ocean",   emoji:"🌊", desc:"Waves and tide",       url:"/assets/ocean-waves-112906.mp3", color:"rgba(74,124,89,0.3)" },
+    { id:"forest", label:"Forest",  emoji:"🌲", desc:"Birds and breeze",     url:"/assets/audiopapkin-forest-ambience-296528.mp3", color:"rgba(143,173,148,0.3)" },
+    { id:"silence",label:"Silence", emoji:"🔇", desc:"Pure quiet",           url:"/assets/h-beats-quite-bass-effect-265754.mp3", color:"rgba(123,111,160,0.3)" },
   ];
 
   const toggle = (id: string, url: string|null) => {
@@ -790,6 +1027,11 @@ function SoundSpace() {
 
         {active && (
           <div style={{ marginTop:24 }}>
+            {/* Animated graphic matching the chosen soundscape */}
+            <div style={{ position:"relative", height:90, borderRadius:16, overflow:"hidden", background:"rgba(255,255,255,0.02)", border:"1px solid rgba(255,255,255,0.06)", marginBottom:20 }}>
+              <SoundGraphic id={active} />
+            </div>
+
             <p className="serif" style={{ textAlign:"center", fontSize:18, color:"rgba(185,210,195,0.7)", fontWeight:300, margin:"0 0 20px" }}>
               {activeSnd?.label} playing softly…
             </p>
@@ -810,7 +1052,7 @@ function SoundSpace() {
   );
 }
 
-// ─── 08 Body Scan (NEW) ───────────────────────────────────────────────────
+// ─── 08 Body Scan ───────────────────────────────────────────────────────
 
 const BODY_PARTS = [
   { id:"head",    label:"Head & Face",   y:8,   msg:"Relax your forehead, jaw, and eyes. Let your tongue drop from the roof of your mouth." },
@@ -821,6 +1063,45 @@ const BODY_PARTS = [
   { id:"legs",    label:"Legs",          y:76,  msg:"Let your legs be heavy. You don't need to go anywhere right now." },
   { id:"feet",    label:"Feet",          y:90,  msg:"Feel the ground beneath your feet. This is where you are. You are here. You are safe." },
 ];
+
+function BodySilhouette({ activeId, completed }: { activeId: string|null; completed: Set<string> }) {
+  return (
+    <svg viewBox="0 0 160 420" width={120} height={300} style={{ display:"block", margin:"0 auto" }}>
+      <defs>
+        <radialGradient id="bodyGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="rgba(184,205,212,0.45)" />
+          <stop offset="100%" stopColor="rgba(184,205,212,0)" />
+        </radialGradient>
+      </defs>
+      {/* silhouette */}
+      <g opacity="0.55">
+        <ellipse cx="80" cy="38" rx="22" ry="26" fill="rgba(184,205,212,0.1)" stroke="rgba(184,205,212,0.3)" strokeWidth="1" />
+        <path d="M50 70 Q80 58 110 70 L122 150 Q80 168 38 150 Z" fill="rgba(184,205,212,0.08)" stroke="rgba(184,205,212,0.25)" strokeWidth="1" />
+        <path d="M44 150 Q80 165 116 150 L108 230 Q80 244 52 230 Z" fill="rgba(184,205,212,0.07)" stroke="rgba(184,205,212,0.2)" strokeWidth="1" />
+        <path d="M52 230 Q80 244 108 230 L100 280 Q80 290 60 280 Z" fill="rgba(184,205,212,0.07)" stroke="rgba(184,205,212,0.2)" strokeWidth="1" />
+        <path d="M62 280 L56 380 Q68 392 80 392 Q92 392 104 380 L98 280 Z" fill="rgba(184,205,212,0.06)" stroke="rgba(184,205,212,0.18)" strokeWidth="1" />
+        <ellipse cx="64" cy="402" rx="14" ry="8" fill="rgba(184,205,212,0.08)" stroke="rgba(184,205,212,0.2)" strokeWidth="1" />
+        <ellipse cx="96" cy="402" rx="14" ry="8" fill="rgba(184,205,212,0.08)" stroke="rgba(184,205,212,0.2)" strokeWidth="1" />
+      </g>
+      {/* region glows */}
+      {BODY_PARTS.map(r => {
+        const cy = (r.y/100)*420;
+        const isActive = activeId === r.id;
+        const isDone = completed.has(r.id);
+        return (
+          <circle
+            key={r.id} cx={80} cy={cy} r={isActive?28:18}
+            fill="url(#bodyGlow)"
+            opacity={isActive?0.95: isDone?0.55:0.16}
+            style={{ transition:"opacity 0.5s ease, r 0.5s ease" }}
+          >
+            {isActive && <animate attributeName="r" values="22;30;22" dur="2s" repeatCount="indefinite" />}
+          </circle>
+        );
+      })}
+    </svg>
+  );
+}
 
 function BodyScan() {
   const [active, setActive] = useState<string|null>(null);
@@ -854,7 +1135,12 @@ function BodyScan() {
     <section style={{ padding:"80px 40px", borderTop:"1px solid rgba(255,255,255,0.06)", background:"linear-gradient(135deg, rgba(184,205,212,0.04) 0%, rgba(74,124,89,0.04) 100%)" }}>
       <SectionHeader eyebrow="08 — Body Scan" title="Come back to your body." subtitle="A guided scan releases stored tension and reconnects mind to body — try the full sequence." color="rgba(184,205,212,0.8)" />
 
-      <div style={{ maxWidth:680, margin:"48px auto 0", display:"grid", gridTemplateColumns:"1fr 1fr", gap:40, alignItems:"start" }}>
+      <div style={{ maxWidth:780, margin:"48px auto 0", display:"grid", gridTemplateColumns:"auto 1fr 1fr", gap:32, alignItems:"start" }}>
+        {/* Glowing silhouette — the body, seen */}
+        <div style={{ position:"sticky", top:40 }}>
+          <BodySilhouette activeId={active} completed={completed} />
+        </div>
+
         {/* Body parts list */}
         <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
           {BODY_PARTS.map((b, i) => {
@@ -893,7 +1179,7 @@ function BodyScan() {
               </p>
               {autoPlay && (
                 <div style={{ marginTop:20, height:3, background:"rgba(255,255,255,0.08)", borderRadius:3, overflow:"hidden" }}>
-                  <div style={{ height:"100%", background:"rgba(184,205,212,0.5)", borderRadius:3, animation:"drawCircle 6s linear forwards" }} />
+                  <div key={autoIdx} style={{ height:"100%", background:"rgba(184,205,212,0.5)", borderRadius:3, animation:"drawCircle 6s linear forwards" }} />
                 </div>
               )}
             </div>
@@ -923,16 +1209,19 @@ function BodyScan() {
 
 function FooterCTA() {
   return (
-    <section style={{ padding:"100px 40px", borderTop:"1px solid rgba(255,255,255,0.06)", textAlign:"center" }}>
-      <h2 className="serif" style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:300, color:"rgba(235,245,238,0.95)", margin:"0 0 20px", lineHeight:1.2 }}>
-        Return whenever you need stillness.
-      </h2>
-      <p style={{ fontSize:16, color:"rgba(185,210,195,0.6)", maxWidth:480, margin:"0 auto 40px", lineHeight:1.8 }}>
-        These practices are always here. Visit whenever your mind needs rest, your heart needs healing, or your spirit needs grounding.
-      </p>
-      <button style={{ padding:"16px 40px", borderRadius:50, background:"linear-gradient(135deg, rgba(143,173,148,0.3), rgba(123,111,160,0.3))", border:"1px solid rgba(143,173,148,0.4)", color:"rgba(235,245,238,0.9)", fontSize:15, cursor:"pointer", letterSpacing:"0.05em", transition:"all 0.3s ease" }}>
-        ✦ Begin Your Practice
-      </button>
+    <section style={{ padding:"100px 40px", borderTop:"1px solid rgba(255,255,255,0.06)", textAlign:"center", position:"relative", overflow:"hidden" }}>
+      <BubbleField count={10} />
+      <div style={{ position:"relative", zIndex:1 }}>
+        <h2 className="serif" style={{ fontSize:"clamp(32px,4vw,52px)", fontWeight:300, color:"rgba(235,245,238,0.95)", margin:"0 0 20px", lineHeight:1.2 }}>
+          Return whenever you need stillness.
+        </h2>
+        <p style={{ fontSize:16, color:"rgba(185,210,195,0.6)", maxWidth:480, margin:"0 auto 40px", lineHeight:1.8 }}>
+          These practices are always here. Visit whenever your mind needs rest, your heart needs healing, or your spirit needs grounding.
+        </p>
+        <button style={{ padding:"16px 40px", borderRadius:50, background:"linear-gradient(135deg, rgba(143,173,148,0.3), rgba(123,111,160,0.3))", border:"1px solid rgba(143,173,148,0.4)", color:"rgba(235,245,238,0.9)", fontSize:15, cursor:"pointer", letterSpacing:"0.05em", transition:"all 0.3s ease" }}>
+          ✦ Begin Your Practice
+        </button>
+      </div>
     </section>
   );
 }
